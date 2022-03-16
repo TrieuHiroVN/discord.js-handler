@@ -2,11 +2,11 @@ const client = require("../index");
 
 client.on("interactionCreate", async (interaction) => {
     if(interaction.isCommand()) {
-        if(interaction.ephemeral) await interaction.deferReply({ ephemeral: true });
-        else await interaction.deferReply({ ephemeral: false });
-
         const command = client.slashCommands.get(interaction.commandName);
-        if(!command) return interaction.followUp({ content: "An error has occured!" });
+        if(!command) return interaction.followUp({ content: "An error has occurred!" });
+
+        if(command.ephemeral) interaction.deferReply({ ephemeral: true });
+        else interaction.deferReply({ ephemeral: false });
 
         const args = [];
 
