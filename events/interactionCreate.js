@@ -3,15 +3,12 @@ const client = require("../index");
 client.on("interactionCreate", async (interaction) => {
     if(interaction.isCommand()) {
         const command = client.slashCommands.get(interaction.commandName);
-        if(!command) return interaction.followUp({ content: "An error has occurred!" });
-
-        if(command.ephemeral) interaction.deferReply({ ephemeral: true });
-        else interaction.deferReply({ ephemeral: false });
+        if(!command) return interaction.reply({ content: "An error has occurred!" });
 
         const args = [];
 
         for(option of interaction.options.data) {
-            if(option.type === "SUB_COMMAND") {
+            if(["SUB_COMMAND", "SUB_COMMAND_GROUP"].includes(option.type)) {
                 if(option.name) args.push(option.name);
 
                 option.options?.forEach(x => {
@@ -19,6 +16,7 @@ client.on("interactionCreate", async (interaction) => {
                 });
             } else if(option.value) args.push(option.value);
         };
+
         interaction.member = interaction.guild.members.cache.get(interaction.user.id);
 
         try {
@@ -29,7 +27,6 @@ client.on("interactionCreate", async (interaction) => {
     };
 
     if(interaction.isContextMenu()) {
-        await interaction.deferReply({ ephemeral: false });
         const command = client.slashCommands.get(interaction.commandName);
         if(command) command.run(client, interaction);
     };
